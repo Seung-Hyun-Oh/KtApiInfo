@@ -54,4 +54,42 @@ public class SttService {
                 .bodyToMono(String.class)
                 .doOnError(e -> System.err.println("KT API 호출 에러: " + e.getMessage()));
     }
+
+    /**
+     * STT 요청 (POST /v2/voiceRecognize)
+     * @param audioFile
+     * @param sttMode
+     * @return
+     */
+    public Mono<String> requestStt(MultipartFile audioFile, String sttMode) {
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("encoding", "lpcm");
+        metadata.put("targetLanguage", "ko");
+        metadata.put("sttMode", sttMode);
+
+        builder.part("metadata", metadata, MediaType.APPLICATION_JSON);
+        builder.part("audio", audioFile.getResource(), MediaType.APPLICATION_OCTET_STREAM);
+
+        return webClient.post()
+                .uri("/v2/voiceRecognize")
+                .header("Authorization", "Bearer " + apiKey)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData(builder.build()))
+                .retrieve()
+                .bodyToMono(String.class); // 여기서 transactionId가 포함된 JSON 응답
+    }
+
+    /**
+     * 2. STT 결과 조회 (GET /v2/voiceRecognize/{transactionId})
+     * @param transactionId
+     * @return
+     */
+    public Mono<String> getSttResult(String transactionId) {
+        return webClient.get()
+                .uri("/v2/voiceRecognize/{id}", transactionId)
+                .header("Authorization", "Bearer " + apiKey)
+                .retrieve()
+                .bodyToMono(String.class); // sttStatus: processing 또는 completed 응답
+    }
 }
