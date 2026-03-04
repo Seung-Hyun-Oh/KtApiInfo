@@ -1,0 +1,61 @@
+spring:
+  application:
+    name: KtApiInfo
+
+  # Message Source 인코딩 설정
+  messages:
+    basename: messages
+    encoding: UTF-8
+    fallback-to-system-locale: true
+
+  profiles:
+    active: local # 기본값
+    group:
+      local: [ "local", "swagger" ]
+      dev: [ "dev", "swagger" ]
+      prod: [ "prod" ] # 운영은 스웨거 제외
+
+  mail:
+    host: smtp.gmail.com  # 최소한 호스트 정보는 있어야 빈이 생성됩니다.
+    port: 587
+    username: your-email@gmail.com
+    password: your-app-password
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  cloud:
+    aws:
+      credentials:
+        access-key: ${AWS_ACCESS_KEY}
+        secret-key: ${AWS_SECRET_KEY}
+      region:
+        static: ap-northeast-2
+      ses:
+        enabled: true
+
+# MyBatis Configuration
+# Mapper XML 파일의 위치 (일반적으로 resources/mapper 하위)
+mybatis:
+  mapper-locations: classpath:mapper/**/*.xml
+  # VO/DTO 객체의 패키지 경로 (XML에서 짧은 이름 사용 가능)
+  type-aliases-package: com.kt.ktapiinfo.dto
+  # 스네이크 케이스(DB)를 카멜 케이스(Java)로 자동 변환
+  configuration:
+    map-underscore-to-camel-case: true
+
+jasypt:
+  encryptor:
+    bean: jasyptStringEncryptor
+    property:
+      prefix: "ENC("
+      suffix: ")"
+    #password: your_secret_password
+
+kt:
+  api:
+    url: https://api.kt.co.kr
+    key: ${KT_API_KEY:your_default_test_key_here} # 환경변수 KT_API_KEY가 없으면 기본값 사용
