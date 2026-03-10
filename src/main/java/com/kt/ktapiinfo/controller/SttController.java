@@ -14,7 +14,8 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/api/stt")
 @RequiredArgsConstructor // 생성자 주입 자동 생성
-@CrossOrigin(origins = "http://localhost:3000")
+// 아래 설정을 구체적으로 적어주거나 전체 허용합니다.
+@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*", methods = {RequestMethod.POST, RequestMethod.GET})
 public class SttController {
 
     private final SttService sttService;
